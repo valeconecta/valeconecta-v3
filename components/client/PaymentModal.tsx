@@ -4,7 +4,7 @@ import { XIcon, ShieldCheckIcon, SpinnerIcon } from '../Icons';
 import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
 
 // INSTRUÇÃO: Substitua pela sua PUBLIC KEY do Mercado Pago.
-const MERCADO_PAGO_PUBLIC_KEY = 'SUA_PUBLIC_KEY_AQUI';
+const MERCADO_PAGO_PUBLIC_KEY = 'APP_USR-f23f8641-4548-43c7-a694-a15be18b089b';
 
 interface PaymentModalProps {
   isOpen: boolean;
