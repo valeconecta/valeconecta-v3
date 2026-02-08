@@ -1,1 +1,12 @@
+# Cole este código dentro de: netlify.toml
 
+[build]
+  publish = "." 
+
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
