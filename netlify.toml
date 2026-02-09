@@ -1,0 +1,21 @@
+[build]
+  # Não há um comando de build explícito, então servimos os arquivos estáticos diretamente.
+  command = "echo 'Nenhum comando de build especificado'"
+  publish = "."
+
+[functions]
+  # Define o diretório para as funções serverless da Netlify.
+  directory = "netlify/functions"
+
+# Regra de reescrita para que as chamadas a /api/* sejam direcionadas para as funções serverless.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Regra de fallback para SPA. Deve ser a última regra.
+# Redireciona todas as outras requisições para o index.html para que o React Router possa gerenciá-las.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

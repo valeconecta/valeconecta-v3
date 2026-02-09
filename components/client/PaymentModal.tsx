@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { XIcon, ShieldCheckIcon, SpinnerIcon } from '../Icons';
 import { initMercadoPago, Payment } from '@mercadopago/sdk-react';
 
-// INSTRUÇÃO: Substitua pela sua PUBLIC KEY do Mercado Pago.
-const MERCADO_PAGO_PUBLIC_KEY = 'SUA_PUBLIC_KEY_AQUI';
+// INSTRUÇÃO: A chave pública será lida da variável de ambiente no deploy.
+const MERCADO_PAGO_PUBLIC_KEY = process.env.MERCADO_PAGO_PUBLIC_KEY || 'SUA_PUBLIC_KEY_AQUI';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -18,24 +17,28 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onSubmit, 
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (isOpen) {
-      // Inicializa o Mercado Pago SDK
+      if (MERCADO_PAGO_PUBLIC_KEY === 'SUA_PUBLIC_KEY_AQUI') {
+        console.error("Chave pública do Mercado Pago não configurada nas variáveis de ambiente.");
+        setError("Configuração de pagamento indisponível.");
+        return;
+      }
+      
       initMercadoPago(MERCADO_PAGO_PUBLIC_KEY, { locale: 'pt-BR' });
 
-      // Função para criar a preferência de pagamento no backend
       const createPreference = async () => {
         setIsLoading(true);
+        setError(null);
         setPreferenceId(null);
         try {
-          // Esta é a chamada para o seu backend.
-          // O endpoint '/api/create-preference' é um exemplo.
+          // A chamada agora é para a função serverless da Netlify em /api/create-preference
           const response = await fetch('/api/create-preference', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               title: `Serviço com ${professionalName}`,
               price: price,
@@ -43,22 +46,15 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onSubmit, 
           });
           
           if (!response.ok) {
-              // Simulação de erro caso o backend não esteja configurado
-              throw new Error("Backend not implemented. Simulating error.");
+              throw new Error("Não foi possível preparar o pagamento. Tente novamente mais tarde.");
           }
 
           const data = await response.json();
           setPreferenceId(data.preferenceId);
 
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error creating preference:', error);
-          // SIMULAÇÃO: Como não temos um backend real, vamos simular a criação de uma preferência.
-          // REMOVA esta parte quando seu backend estiver funcionando.
-          console.warn("Simulando criação de preferência pois o backend não foi encontrado.");
-          setTimeout(() => {
-            setPreferenceId('mock-preference-id-12345'); // ID Falso para testes
-          }, 1500);
-          // FIM DA SIMULAÇÃO
+          setError(error.message || "Ocorreu um erro inesperado ao iniciar o pagamento.");
         } finally {
           setIsLoading(false);
         }
@@ -69,12 +65,9 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onSubmit, 
   }, [isOpen, professionalName, price]);
 
   const handlePaymentSubmit = async () => {
-    // A SDK do Mercado Pago lida com o envio.
-    // Esta função será chamada após o pagamento ser processado com sucesso pela SDK.
     setIsPaymentProcessing(true);
-    // Simula uma pequena espera para feedback visual
     setTimeout(() => {
-      onSubmit(); // Chama a função original para atualizar o status da tarefa no Supabase
+      onSubmit();
       setIsPaymentProcessing(false);
     }, 1500);
   };
@@ -82,7 +75,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onSubmit, 
   const paymentBrickCustomization = {
     visual: {
       style: {
-        theme: 'bootstrap', // ou 'default', 'dark'
+        theme: 'bootstrap',
         customVariables: {
           formBackgroundColor: '#ffffff',
           baseColor: '#2A8C82',
@@ -122,10 +115,19 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ isOpen, onClose, onSubmit, 
           </div>
 
           <div id="payment-brick-container" className="mt-4 min-h-[200px]">
-            {isLoading || !preferenceId ? (
-              <div className="flex flex-col items-center justify-center h-full">
-                <SpinnerIcon className="h-8 w-8 animate-spin text-[#2A8C82]" />
-                <p className="mt-2 text-sm text-gray-500">Preparando pagamento seguro...</p>
+            {isLoading || error || !preferenceId ? (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                {isLoading ? (
+                    <>
+                        <SpinnerIcon className="h-8 w-8 animate-spin text-[#2A8C82]" />
+                        <p className="mt-2 text-sm text-gray-500">Preparando pagamento seguro...</p>
+                    </>
+                ) : (
+                    <div className="text-red-600">
+                        <p className="font-semibold">Erro!</p>
+                        <p className="text-sm">{error}</p>
+                    </div>
+                )}
               </div>
             ) : isPaymentProcessing ? (
                <div className="flex flex-col items-center justify-center h-full">
