@@ -10,8 +10,8 @@ interface HomePageProps {
   startSearch: (params: { query?: string; category?: string }) => void;
 }
 
-const CategoryCard: React.FC<{ icon: React.ReactNode; title: string; }> = ({ icon, title }) => (
-  <div className="group text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+const CategoryCard: React.FC<{ icon: React.ReactNode; title: string; onClick: () => void; }> = ({ icon, title, onClick }) => (
+  <div onClick={onClick} className="group text-center p-6 bg-white rounded-xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer">
     <div className="inline-block p-4 bg-[#E8F3F1] rounded-full group-hover:bg-[#2A8C82] transition-colors duration-300">
       {React.cloneElement(icon as React.ReactElement, { className: "h-8 w-8 text-[#2A8C82] group-hover:text-white transition-colors duration-300" })}
     </div>
@@ -65,6 +65,10 @@ const HomePage: React.FC<HomePageProps> = ({setCurrentPage, startSearch}) => {
     if (searchQuery.trim()) {
         startSearch({ query: searchQuery });
     }
+  };
+
+  const handleCategoryClick = (category: string) => {
+    startSearch({ category });
   };
 
   useEffect(() => {
@@ -136,12 +140,12 @@ const HomePage: React.FC<HomePageProps> = ({setCurrentPage, startSearch}) => {
           <h2 className="text-3xl font-bold text-[#333333]">Serviços mais procurados</h2>
           <p className="mt-4 text-lg text-[#666666] max-w-2xl mx-auto">Encontre ajuda para qualquer tarefa, grande ou pequena.</p>
           <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-8">
-            <CategoryCard icon={<WrenchIcon />} title="Reparos Gerais" />
-            <CategoryCard icon={<PaintBrushIcon />} title="Pintura" />
-            <CategoryCard icon={<BroomIcon />} title="Faxina e Limpeza" />
-            <CategoryCard icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 12H3"/><path d="M16 12h-2"/><path d="M6 12v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2"/><path d="M18 12v2a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4v-2"/></svg>} title="Encanamento" />
-            <CategoryCard icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 22v-5l5-5 5 5-5 5z"/><path d="M9.5 14.5 16 8l3 3-6.5 6.5z"/><path d="m17 11 4.5-4.5"/></svg>} title="Jardinagem" />
-            <CategoryCard icon={<LeafIcon />} title="Serviços Ecológicos" />
+            <CategoryCard icon={<WrenchIcon />} title="Reparos Gerais" onClick={() => handleCategoryClick('Reparos Gerais')} />
+            <CategoryCard icon={<PaintBrushIcon />} title="Pintura" onClick={() => handleCategoryClick('Pintura')} />
+            <CategoryCard icon={<BroomIcon />} title="Faxina e Limpeza" onClick={() => handleCategoryClick('Faxina e limpeza doméstica')} />
+            <CategoryCard icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 12H3"/><path d="M16 12h-2"/><path d="M6 12v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2"/><path d="M18 12v2a4 4 0 0 1-4 4h-2a4 4 0 0 1-4-4v-2"/></svg>} title="Encanamento" onClick={() => handleCategoryClick('Encanamento')} />
+            <CategoryCard icon={<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 22v-5l5-5 5 5-5 5z"/><path d="M9.5 14.5 16 8l3 3-6.5 6.5z"/><path d="m17 11 4.5-4.5"/></svg>} title="Jardinagem" onClick={() => handleCategoryClick('Jardinagem')} />
+            <CategoryCard icon={<LeafIcon />} title="Serviços Ecológicos" onClick={() => handleCategoryClick('Serviços Ecológicos')} />
           </div>
         </div>
       </section>
@@ -164,7 +168,7 @@ const HomePage: React.FC<HomePageProps> = ({setCurrentPage, startSearch}) => {
                 <span className="text-6xl font-black text-[#E8F3F1]">01</span>
                 <h3 className="text-3xl font-bold text-[#333333] mt-2">Descreva sua necessidade</h3>
                 <p className="mt-4 text-lg text-[#666666]">
-                  Use nosso Agendamento Inteligente ou publique uma tarefa detalhando o que você precisa. Quanto mais informações você der, melhores serão as propostas.
+                  Use nosso Agendamento Inteligente para publicar uma tarefa detalhando o que você precisa. Quanto mais informações você der, melhores serão as propostas.
                 </p>
                 <ul className="mt-4 space-y-2 text-[#666666]">
                   <li className="flex items-start"><CheckCircleIcon className="h-5 w-5 text-[#2A8C82] mr-2 mt-1 flex-shrink-0"/> Seja específico sobre o serviço.</li>
