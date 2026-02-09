@@ -1,6 +1,5 @@
 
 import React, { useEffect, useState } from 'react';
-import Chatbot from '../components/Chatbot';
 import { BroomIcon, LeafIcon, PaintBrushIcon, ShieldCheckIcon, StarIcon, WrenchIcon, CheckCircleIcon } from '../components/Icons';
 import { Page } from '../types';
 import { Professional } from '../data/professionals';
@@ -59,6 +58,14 @@ const FeaturedProfessionalCard: React.FC<{ professional: Professional; setCurren
 const HomePage: React.FC<HomePageProps> = ({setCurrentPage, startSearch}) => {
   const [featuredProfessionals, setFeaturedProfessionals] = useState<Professional[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+        startSearch({ query: searchQuery });
+    }
+  };
 
   useEffect(() => {
     const anchor = sessionStorage.getItem('scrollToAnchor');
@@ -93,19 +100,31 @@ const HomePage: React.FC<HomePageProps> = ({setCurrentPage, startSearch}) => {
   return (
     <>
       {/* Hero Section */}
-      <section className="custom-gradient pt-16 pb-20">
+      <section className="custom-gradient pt-20 pb-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-left">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#333333] tracking-tight leading-tight">
-                A solução completa para sua casa, <span className="text-[#2A8C82]">conectada a você.</span>
-              </h1>
-              <p className="mt-6 text-lg text-[#666666] max-w-xl mx-auto lg:mx-0">
-                Descreva o que precisa, receba propostas de profissionais qualificados e resolva tudo em um só lugar. Simples, rápido e seguro.
-              </p>
-            </div>
-            <div>
-              <Chatbot startSearch={startSearch} />
+          <div className="text-center max-w-3xl mx-auto">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#333333] tracking-tight leading-tight">
+              A solução completa para sua casa, <span className="text-[#2A8C82]">conectada a você.</span>
+            </h1>
+            <p className="mt-6 text-lg text-[#666666]">
+              Encontre profissionais qualificados para qualquer serviço. Simples, rápido e seguro.
+            </p>
+            <div className="mt-10 max-w-xl mx-auto">
+              <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
+                  <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Qual serviço você precisa? Ex: Pintor"
+                      className="flex-grow px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2A8C82] shadow-sm text-lg"
+                  />
+                  <button
+                      type="submit"
+                      className="bg-[#2A8C82] text-white px-8 py-3 rounded-lg font-bold text-lg hover:bg-opacity-90 transition-transform transform hover:scale-105"
+                  >
+                      Buscar
+                  </button>
+              </form>
             </div>
           </div>
         </div>
